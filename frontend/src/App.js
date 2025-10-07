@@ -8,22 +8,10 @@ import GenericDataGrid from './components/GenericDataGrid';
 import DetailView from './components/DetailView';
 import NotificationHandler from './components/NotificationHandler';
 
-/**
- * Main App Component
- * 
- * This sets up:
- * - Redux store for state management
- * - Material-UI theme for consistent styling
- * - React Router for navigation between pages
- * - Routes for the DataGrid and Detail views
- * - Global notification system
- */
-
-// Create a custom MUI theme
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#1976d2', // BMW blue-ish color
+      main: '#1976d2',
     },
     secondary: {
       main: '#dc004e',

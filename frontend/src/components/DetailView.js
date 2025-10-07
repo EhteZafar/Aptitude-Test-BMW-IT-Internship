@@ -30,7 +30,7 @@ import { fetchCarById, clearSelectedCar } from '../features/cars/carsSlice';
  * - Redux integration
  */
 const DetailView = () => {
-  const { id } = useParams(); // Get the ID from URL
+  const { id } = useParams();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   
@@ -43,13 +43,11 @@ const DetailView = () => {
       dispatch(fetchCarById(id));
     }
     
-    // Cleanup when component unmounts
     return () => {
       dispatch(clearSelectedCar());
     };
   }, [dispatch, id]);
 
-  // Format field names to look nice (snake_case to Title Case)
   const formatFieldName = (field) => {
     return field
       .split('_')
@@ -68,7 +66,6 @@ const DetailView = () => {
     return value.toString();
   };
 
-  // Determine if field should be highlighted (important fields)
   const isHighlightField = (field) => {
     const highlightFields = ['brand', 'model', 'price_euro', 'range_km', 'top_speed_kmh'];
     return highlightFields.includes(field.toLowerCase());

@@ -79,7 +79,7 @@ const GenericDataGrid = ({
     value: ''
   });
 
-  // Filter operators with user-friendly labels
+  // Filter operators for dropdown
   const filterOperators = [
     { value: 'contains', label: 'Contains' },
     { value: 'equals', label: 'Equals' },
@@ -93,7 +93,6 @@ const GenericDataGrid = ({
     { value: 'lessThanOrEqual', label: 'Less Than or Equal' }
   ];
 
-  // Fetch data when component mounts or search/filters change
   useEffect(() => {
     dispatch(fetchCars({ search: searchTerm, filters }));
   }, [dispatch, searchTerm, filters]);
@@ -281,7 +280,7 @@ const GenericDataGrid = ({
         )}
       </Paper>
 
-      {/* AG Grid */}
+      {/* Data Grid */}
       <Paper elevation={3}>
         <div className="ag-theme-material" style={{ height: 600, width: '100%' }}>
           {loading ? (
