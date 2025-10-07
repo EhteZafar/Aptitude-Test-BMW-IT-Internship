@@ -97,7 +97,7 @@ const GenericDataGrid = ({
   }, [fetchData]);
 
   // Handle delete action
-  const handleDelete = async (id) => {
+  const handleDelete = useCallback(async (id) => {
     if (window.confirm('Are you sure you want to delete this item?')) {
       try {
         await axios.delete(`${apiEndpoint}/${id}`);
@@ -107,12 +107,12 @@ const GenericDataGrid = ({
         alert('Failed to delete item');
       }
     }
-  };
+  }, [apiEndpoint, fetchData]);
 
   // Handle view action - navigate to detail page
-  const handleView = (id) => {
+  const handleView = useCallback((id) => {
     navigate(`/details/${id}`);
-  };
+  }, [navigate]);
 
   // Add a new filter
   const handleAddFilter = () => {
@@ -132,7 +132,7 @@ const GenericDataGrid = ({
   };
 
   // Actions column renderer - shows View and Delete buttons
-  const ActionsRenderer = (props) => {
+  const ActionsRenderer = useCallback((props) => {
     return (
       <Box sx={{ display: 'flex', gap: 1 }}>
         <IconButton
@@ -153,7 +153,7 @@ const GenericDataGrid = ({
         </IconButton>
       </Box>
     );
-  };
+  }, [handleView, handleDelete]);
 
   // Automatically generate column definitions from data
   const columnDefs = useMemo(() => {
@@ -188,7 +188,7 @@ const GenericDataGrid = ({
     }
 
     return cols;
-  }, [rowData, enableActions]);
+  }, [rowData, enableActions, ActionsRenderer]);
 
   // Default column properties
   const defaultColDef = useMemo(() => ({
