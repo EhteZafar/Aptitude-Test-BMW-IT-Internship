@@ -2,7 +2,6 @@ const fs = require('fs');
 const csv = require('csv-parser');
 const dotenv = require('dotenv');
 
-// Load environment variables from .env file
 dotenv.config({ path: require('path').join(__dirname, '../../.env') });
 
 const db = require('../config/database');
@@ -12,7 +11,6 @@ async function initDatabase() {
   try {
     console.log('Creating electric_cars table...');
     
-    // Drop table if exists and create new one
     const createTableQuery = `
       CREATE TABLE IF NOT EXISTS electric_cars (
         id INT AUTO_INCREMENT PRIMARY KEY,

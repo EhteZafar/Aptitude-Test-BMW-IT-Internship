@@ -82,7 +82,7 @@ exports.getAllCars = async (req, res) => {
     let query = 'SELECT * FROM electric_cars WHERE 1=1';
     const params = [];
     
-    // Handle search - searches across brand, model, body_style, and segment
+    // searches across brand, model, body_style, and segment
     if (search && search.trim() !== '') {
       query += ` AND (
         brand LIKE ? OR 

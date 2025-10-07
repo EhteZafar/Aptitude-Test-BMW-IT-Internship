@@ -15,7 +15,6 @@ import {
 import { ArrowBack, DirectionsCar } from '@mui/icons-material';
 import { useAppDispatch, useAppSelector } from '../hooks/redux';
 import { fetchCarById, clearSelectedCar } from '../features/cars/carsSlice';
-import { showNotification } from '../features/ui/uiSlice';
 
 /**
  * DetailView Component
