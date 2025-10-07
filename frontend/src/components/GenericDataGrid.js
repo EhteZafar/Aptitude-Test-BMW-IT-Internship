@@ -298,7 +298,6 @@ const GenericDataGrid = ({
         }
       });
 
-    // Add Actions column if enabled
     if (enableActions) {
       cols.push({
         headerName: 'Actions',
@@ -581,7 +580,7 @@ const GenericDataGrid = ({
             <Close />
           </IconButton>
         </DialogTitle>
-        <DialogContent sx={{ pt: 3 }}>
+        <DialogContent sx={{ pt: 3, mt: 3 }}>
           <Stack spacing={3}>
             <FormControl fullWidth>
               <InputLabel>📊 Column</InputLabel>
