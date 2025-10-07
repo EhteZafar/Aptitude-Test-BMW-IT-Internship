@@ -1,70 +1,114 @@
-# Getting Started with Create React App
+# Frontend - Electric Cars Data Management
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+React frontend application with modern UI for managing electric cars data.
 
-## Available Scripts
+## 🚀 Quick Start
 
-In the project directory, you can run:
+```bash
+# Install dependencies
+npm install
 
-### `npm start`
+# Start the development server
+npm start
+```
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+The app will run on `http://localhost:3000`
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## 🎯 Features
 
-### `npm test`
+- 📋 **Interactive Data Grid** - View, sort, and filter electric cars data
+- 🔍 **Advanced Search** - Search across all data fields
+- 🎛️ **Custom Filters** - Add multiple filters with various operators
+- 👁️ **Detail View** - View comprehensive car specifications
+- 🗑️ **Delete Functionality** - Remove cars from the database
+- 📱 **Responsive Design** - Works on desktop, tablet, and mobile
+- 🎨 **Modern UI** - Material-UI components with professional styling
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## 🛠️ Tech Stack
 
-### `npm run build`
+- **React 18** - UI framework
+- **Redux Toolkit** - State management
+- **Material-UI (MUI)** - UI component library
+- **AG Grid** - Advanced data grid
+- **React Router** - Navigation
+- **Axios** - HTTP client
+- **Emotion** - CSS-in-JS styling
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## 📁 Project Structure
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```
+src/
+├── components/           # React components
+│   ├── GenericDataGrid.js   # Main data grid
+│   ├── DetailView.js        # Car detail page
+│   └── NotificationHandler.js # Toast notifications
+├── features/            # Redux slices
+│   ├── cars/               # Car-related state
+│   └── ui/                 # UI state
+├── hooks/               # Custom hooks
+├── store/               # Redux store setup
+├── App.js              # Main app component
+└── index.js            # App entry point
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## 🎨 UI Components
 
-### `npm run eject`
+### Data Grid
+- Sortable columns
+- Pagination (20 rows per page)
+- Search across all fields
+- Multiple filter support
+- Action buttons (View/Delete)
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Detail View
+- Complete car specifications
+- Metric cards with colored highlights
+- Feature badges
+- Navigation back to grid
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Filter Dialog
+- Column selection dropdown
+- Multiple filter operators
+- Dynamic value input
+- Filter chip display
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## 📊 Available Scripts
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+| Command | Description |
+|---------|-------------|
+| `npm start` | Start development server |
+| `npm build` | Build for production |
+| `npm test` | Run test suite |
+| `npm run eject` | Eject from Create React App |
 
-## Learn More
+## 🔧 Dependencies
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```json
+{
+  "react": "^18.2.0",
+  "react-dom": "^18.2.0",
+  "@mui/material": "^7.3.4",
+  "@mui/icons-material": "^7.3.4",
+  "@reduxjs/toolkit": "^2.9.0",
+  "react-redux": "^9.2.0",
+  "react-router-dom": "^7.9.3",
+  "ag-grid-react": "^34.2.0",
+  "ag-grid-community": "^34.2.0",
+  "axios": "^1.x.x"
+}
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## 🌐 API Integration
 
-### Code Splitting
+The frontend connects to the backend API at `http://localhost:5000/api/cars`
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+- Fetches car data with search and filter parameters
+- Handles CRUD operations
+- Error handling with user notifications
+- Loading states for better UX
 
-### Analyzing the Bundle Size
+## 📱 Responsive Breakpoints
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- **Desktop**: > 960px - Full layout
+- **Tablet**: 600px - 960px - Horizontal scroll for grid
+- **Mobile**: < 600px - Compact layout, stacked metrics
