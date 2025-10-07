@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -13,7 +13,9 @@ import {
   Chip
 } from '@mui/material';
 import { ArrowBack, DirectionsCar } from '@mui/icons-material';
-import axios from 'axios';
+import { useAppDispatch, useAppSelector } from '../hooks/redux';
+import { fetchCarById, clearSelectedCar } from '../features/cars/carsSlice';
+import { showNotification } from '../features/ui/uiSlice';
 
 /**
  * DetailView Component
@@ -26,31 +28,27 @@ import axios from 'axios';
  * - Back button to return to grid
  * - Loading state
  * - Error handling
+ * - Redux integration
  */
-const DetailView = ({ apiEndpoint = 'http://localhost:5000/api/cars' }) => {
+const DetailView = () => {
   const { id } = useParams(); // Get the ID from URL
   const navigate = useNavigate();
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const dispatch = useAppDispatch();
+  
+  // Redux state
+  const { selectedCar: data, loading, error } = useAppSelector((state) => state.cars);
 
   // Fetch the detailed data when component loads
   useEffect(() => {
-    const fetchDetail = async () => {
-      try {
-        setLoading(true);
-        const response = await axios.get(`${apiEndpoint}/${id}`);
-        setData(response.data.data);
-      } catch (err) {
-        console.error('Error fetching details:', err);
-        setError('Failed to load details. The item may not exist.');
-      } finally {
-        setLoading(false);
-      }
+    if (id) {
+      dispatch(fetchCarById(id));
+    }
+    
+    // Cleanup when component unmounts
+    return () => {
+      dispatch(clearSelectedCar());
     };
-
-    fetchDetail();
-  }, [id, apiEndpoint]);
+  }, [dispatch, id]);
 
   // Format field names to look nice (snake_case to Title Case)
   const formatFieldName = (field) => {

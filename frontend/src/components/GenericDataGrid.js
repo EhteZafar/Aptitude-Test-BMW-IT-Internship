@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { AgGridReact } from 'ag-grid-react';
+import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-material.css';
 import {
@@ -18,11 +19,28 @@ import {
   FormControl,
   InputLabel,
   Chip,
-  Stack
+  Stack,
+  CircularProgress
 } from '@mui/material';
 import { Visibility, Delete, FilterList, Close } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { useAppDispatch, useAppSelector } from '../hooks/redux';
+import {
+  fetchCars,
+  deleteCar,
+  setSearchTerm,
+  addFilter,
+  removeFilter,
+  clearError
+} from '../features/cars/carsSlice';
+import {
+  openFilterDialog,
+  closeFilterDialog,
+  showNotification
+} from '../features/ui/uiSlice';
+
+// Register AG Grid modules
+ModuleRegistry.registerModules([AllCommunityModule]);
 
 /**
  * GenericDataGrid Component
@@ -38,22 +56,28 @@ import axios from 'axios';
  * - Sorting and pagination
  */
 const GenericDataGrid = ({
-  apiEndpoint = 'http://localhost:5000/api/cars',
-  onRowClick,
   enableActions = true
 }) => {
-  const [rowData, setRowData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filters, setFilters] = useState([]);
-  const [filterDialogOpen, setFilterDialogOpen] = useState(false);
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  
+  // Redux state
+  const {
+    cars: rowData,
+    loading,
+    searchTerm,
+    filters,
+    error
+  } = useAppSelector((state) => state.cars);
+  
+  const { filterDialogOpen } = useAppSelector((state) => state.ui);
+  
+  // Local state for filter dialog
   const [currentFilter, setCurrentFilter] = useState({
     column: '',
     operator: 'contains',
     value: ''
   });
-  
-  const navigate = useNavigate();
 
   // Filter operators with user-friendly labels
   const filterOperators = [
@@ -69,45 +93,28 @@ const GenericDataGrid = ({
     { value: 'lessThanOrEqual', label: 'Less Than or Equal' }
   ];
 
-  // Fetch data from API with search and filters
-  const fetchData = useCallback(async () => {
-    setLoading(true);
-    try {
-      const params = {};
-      
-      if (searchTerm) {
-        params.search = searchTerm;
-      }
-      
-      if (filters.length > 0) {
-        params.filters = JSON.stringify(filters);
-      }
-      
-      const response = await axios.get(apiEndpoint, { params });
-      setRowData(response.data.data || []);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, [apiEndpoint, searchTerm, filters]);
-
+  // Fetch data when component mounts or search/filters change
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    dispatch(fetchCars({ search: searchTerm, filters }));
+  }, [dispatch, searchTerm, filters]);
 
   // Handle delete action
   const handleDelete = useCallback(async (id) => {
     if (window.confirm('Are you sure you want to delete this item?')) {
       try {
-        await axios.delete(`${apiEndpoint}/${id}`);
-        fetchData(); // Refresh data
+        await dispatch(deleteCar(id)).unwrap();
+        dispatch(showNotification({
+          message: 'Car deleted successfully!',
+          severity: 'success'
+        }));
       } catch (error) {
-        console.error('Error deleting item:', error);
-        alert('Failed to delete item');
+        dispatch(showNotification({
+          message: 'Failed to delete car',
+          severity: 'error'
+        }));
       }
     }
-  }, [apiEndpoint, fetchData]);
+  }, [dispatch]);
 
   // Handle view action - navigate to detail page
   const handleView = useCallback((id) => {
@@ -120,15 +127,25 @@ const GenericDataGrid = ({
         (currentFilter.value || 
          currentFilter.operator === 'isEmpty' || 
          currentFilter.operator === 'isNotEmpty')) {
-      setFilters([...filters, currentFilter]);
+      dispatch(addFilter(currentFilter));
       setCurrentFilter({ column: '', operator: 'contains', value: '' });
-      setFilterDialogOpen(false);
+      dispatch(closeFilterDialog());
     }
   };
 
   // Remove a filter
   const handleRemoveFilter = (index) => {
-    setFilters(filters.filter((_, i) => i !== index));
+    dispatch(removeFilter(index));
+  };
+
+  // Handle search term change
+  const handleSearchChange = (e) => {
+    dispatch(setSearchTerm(e.target.value));
+  };
+
+  // Handle refresh
+  const handleRefresh = () => {
+    dispatch(fetchCars({ search: searchTerm, filters }));
   };
 
   // Actions column renderer - shows View and Delete buttons
@@ -222,20 +239,21 @@ const GenericDataGrid = ({
             variant="outlined"
             size="small"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={handleSearchChange}
             placeholder="Search across all columns..."
             sx={{ flexGrow: 1 }}
           />
           <Button
             variant="contained"
             startIcon={<FilterList />}
-            onClick={() => setFilterDialogOpen(true)}
+            onClick={() => dispatch(openFilterDialog())}
           >
             Add Filter
           </Button>
           <Button
             variant="outlined"
-            onClick={fetchData}
+            onClick={handleRefresh}
+            disabled={loading}
           >
             Refresh
           </Button>
@@ -266,25 +284,30 @@ const GenericDataGrid = ({
       {/* AG Grid */}
       <Paper elevation={3}>
         <div className="ag-theme-material" style={{ height: 600, width: '100%' }}>
-          <AgGridReact
-            rowData={rowData}
-            columnDefs={columnDefs}
-            defaultColDef={defaultColDef}
-            pagination={true}
-            paginationPageSize={20}
-            loading={loading}
-            animateRows={true}
-            rowSelection="single"
-          />
+          {loading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+              <CircularProgress />
+            </Box>
+          ) : (
+            <AgGridReact
+              rowData={rowData}
+              columnDefs={columnDefs}
+              defaultColDef={defaultColDef}
+              pagination={true}
+              paginationPageSize={20}
+              animateRows={true}
+              rowSelection="single"
+            />
+          )}
         </div>
       </Paper>
 
       {/* Filter Dialog */}
-      <Dialog open={filterDialogOpen} onClose={() => setFilterDialogOpen(false)} maxWidth="sm" fullWidth>
+      <Dialog open={filterDialogOpen} onClose={() => dispatch(closeFilterDialog())} maxWidth="sm" fullWidth>
         <DialogTitle>
           Add Filter
           <IconButton
-            onClick={() => setFilterDialogOpen(false)}
+            onClick={() => dispatch(closeFilterDialog())}
             sx={{ position: 'absolute', right: 8, top: 8 }}
           >
             <Close />
@@ -334,7 +357,7 @@ const GenericDataGrid = ({
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setFilterDialogOpen(false)}>Cancel</Button>
+          <Button onClick={() => dispatch(closeFilterDialog())}>Cancel</Button>
           <Button onClick={handleAddFilter} variant="contained">
             Add Filter
           </Button>
