@@ -39,7 +39,6 @@ import {
   showNotification
 } from '../features/ui/uiSlice';
 
-// Register AG Grid modules
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 /**
@@ -61,7 +60,6 @@ const GenericDataGrid = ({
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   
-  // Redux state
   const {
     cars: rowData,
     loading,
@@ -72,7 +70,6 @@ const GenericDataGrid = ({
   
   const { filterDialogOpen } = useAppSelector((state) => state.ui);
   
-  // Local state for filter dialog
   const [currentFilter, setCurrentFilter] = useState({
     column: '',
     operator: 'contains',
@@ -214,7 +211,7 @@ const GenericDataGrid = ({
 
     const firstRow = rowData[0];
     const cols = Object.keys(firstRow)
-      .filter(key => key !== 'created_at') // Hide created_at
+      .filter(key => key !== 'created_at')
       .map(key => {
         const baseConfig = {
           field: key,
@@ -319,7 +316,7 @@ const GenericDataGrid = ({
     sortable: true,
     filter: true,
     resizable: true,
-    floatingFilter: true, // Enable floating filters
+    floatingFilter: true,
     filterParams: {
       buttons: ['reset', 'apply'],
       closeOnApply: true
