@@ -22,7 +22,7 @@ import {
   Stack,
   CircularProgress
 } from '@mui/material';
-import { Visibility, Delete, FilterList, Close } from '@mui/icons-material';
+import { Visibility, Delete, FilterList, Close, Warning } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../hooks/redux';
 import {
@@ -36,7 +36,9 @@ import {
 import {
   openFilterDialog,
   closeFilterDialog,
-  showNotification
+  showNotification,
+  openDeleteDialog,
+  closeDeleteDialog
 } from '../features/ui/uiSlice';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -68,13 +70,16 @@ const GenericDataGrid = ({
     error
   } = useAppSelector((state) => state.cars);
   
-  const { filterDialogOpen } = useAppSelector((state) => state.ui);
+  const { filterDialogOpen, deleteDialogOpen } = useAppSelector((state) => state.ui);
   
   const [currentFilter, setCurrentFilter] = useState({
     column: '',
     operator: 'contains',
     value: ''
   });
+
+  // Local state for delete confirmation
+  const [carToDelete, setCarToDelete] = useState(null);
 
   // Filter operators for dropdown
   const filterOperators = [
@@ -96,9 +101,15 @@ const GenericDataGrid = ({
 
   // Handle delete action
   const handleDelete = useCallback(async (id) => {
-    if (window.confirm('Are you sure you want to delete this item?')) {
+    setCarToDelete(id);
+    dispatch(openDeleteDialog());
+  }, [dispatch]);
+
+  // Confirm delete action
+  const handleConfirmDelete = useCallback(async () => {
+    if (carToDelete) {
       try {
-        await dispatch(deleteCar(id)).unwrap();
+        await dispatch(deleteCar(carToDelete)).unwrap();
         dispatch(showNotification({
           message: 'Car deleted successfully!',
           severity: 'success'
@@ -110,6 +121,14 @@ const GenericDataGrid = ({
         }));
       }
     }
+    setCarToDelete(null);
+    dispatch(closeDeleteDialog());
+  }, [dispatch, carToDelete]);
+
+  // Cancel delete action
+  const handleCancelDelete = useCallback(() => {
+    setCarToDelete(null);
+    dispatch(closeDeleteDialog());
   }, [dispatch]);
 
   // Handle view action - navigate to detail page
@@ -640,6 +659,63 @@ const GenericDataGrid = ({
             sx={{ borderRadius: 2, minWidth: 120, boxShadow: 2 }}
           >
             Apply Filter
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={handleCancelDelete}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: { borderRadius: 3, overflow: 'hidden' }
+        }}
+      >
+        <DialogTitle sx={{ 
+          background: 'linear-gradient(135deg, #f44336 0%, #e57373 100%)',
+          color: 'white',
+          position: 'relative',
+          textAlign: 'center'
+        }}>
+          ⚠️ Confirm Deletion
+        </DialogTitle>
+        <DialogContent sx={{ pt: 3, textAlign: 'center' }}>
+          <Typography variant="h6" gutterBottom>
+            Are you sure you want to delete this car?
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+            This action cannot be undone. The car will be permanently removed from the database.
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ p: 3, justifyContent: 'center', gap: 2, backgroundColor: '#f8f9fa' }}>
+          <Button 
+            onClick={handleCancelDelete}
+            variant="outlined"
+            sx={{ 
+              borderRadius: 2, 
+              minWidth: 120,
+              borderColor: '#ccc',
+              color: '#666'
+            }}
+          >
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleConfirmDelete} 
+            variant="contained"
+            color="error"
+            sx={{ 
+              borderRadius: 2, 
+              minWidth: 120, 
+              boxShadow: 2,
+              '&:hover': {
+                backgroundColor: '#d32f2f'
+              }
+            }}
+          >
+            🗑️ Delete Car
           </Button>
         </DialogActions>
       </Dialog>
